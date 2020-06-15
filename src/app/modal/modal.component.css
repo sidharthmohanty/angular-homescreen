@@ -1,0 +1,149 @@
+.cdk-overlay-backdrop-showing {
+  opacity: 0 !important;
+}
+
+.cdk-overlay-pane {
+  position: absolute !important;
+  left: 5px;
+  bottom: 65px;
+}
+
+.mat-dialog-container {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  overflow: hidden !important;
+}
+
+.head-text {
+  color: white;
+}
+
+.sub-heading {
+  padding-top: 5px;
+  color: white;
+  font-weight: 500;
+}
+
+.items {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 5px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 39px;
+  height: 23px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: gray;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 17px;
+  width: 17px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  -webkit-transition: 0.3s;
+  transition: 0.3s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(14px);
+  -ms-transform: translateX(14px);
+  transform: translateX(14px);
+  background-color: white;
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.profile {
+  padding: 5px 10px 0px 10px;
+  background-color: #303030;
+  display: flex;
+  justify-content: space-between;
+  color: white;
+}
+
+.profile .show {
+  font-size: 40px !important;
+}
+
+.user {
+  display: inline-table;
+  vertical-align: top;
+  padding: 12px 10px;
+}
+
+.logout {
+  padding: 7px 5px;
+}
+
+.cone {
+  position: absolute;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid rgba(0, 0, 0, 0.9);
+  bottom: -10px;
+  left: 15px;
+}
+
+.close {
+  color: white;
+  margin-left: 20px;
+  font-weight: bold;
+  font-size: 25px;
+}
+
+.close:hover {
+  cursor: pointer;
+  color: maroon;
+  transition: ease-in-out 0.3s;
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 600px) {
+  .cdk-overlay-pane {
+    left: 0px !important;
+    right: 0px;
+    bottom: 50px;
+    min-width: 100% !important;
+  }
+}

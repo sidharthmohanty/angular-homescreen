@@ -1,0 +1,98 @@
+<div>
+  <div class="modal-head">
+    <h1 class="head-text">General</h1>
+    <span mat-dialog-close class="close">&times;</span>
+  </div>
+
+  <p class="sub-heading">Customize your dashboard !!</p>
+</div>
+<div>
+  <div class="items">
+    <span class="sub-heading">
+      Greetings
+    </span>
+    <span>
+      <label class="switch">
+        <input
+          type="checkbox"
+          [checked]="greetCheck"
+          (click)="toggleGreetings()"
+        />
+        <span class="slider round"></span>
+      </label>
+    </span>
+  </div>
+
+  <div class="items">
+    <span class="sub-heading">
+      Question
+    </span>
+    <span>
+      <label class="switch">
+        <input
+          type="checkbox"
+          [checked]="questionCheck"
+          (click)="toggleQuestion()"
+        />
+        <span class="slider round"></span>
+      </label>
+    </span>
+  </div>
+
+  <div class="items">
+    <span class="sub-heading">
+      Quote
+    </span>
+    <span>
+      <label class="switch">
+        <input
+          type="checkbox"
+          #greet
+          [checked]="quoteCheck"
+          (click)="toggleQuote()"
+        />
+        <span class="slider round"></span>
+      </label>
+    </span>
+  </div>
+
+  <div class="items">
+    <span class="sub-heading">
+      Date and Time
+    </span>
+    <span>
+      <label class="switch">
+        <input
+          type="checkbox"
+          [checked]="dataAndTimeCheck"
+          (click)="toggleDateAndTime()"
+        />
+        <span class="slider round"></span>
+      </label>
+    </span>
+  </div>
+
+  <div class="items">
+    <span class="sub-heading">
+      Temp and Location
+    </span>
+    <span>
+      <label class="switch">
+        <input
+          type="checkbox"
+          [checked]="tempAndLocationCheck"
+          (click)="toggleTempAndLocation()"
+        />
+        <span class="slider round"></span>
+      </label>
+    </span>
+  </div>
+</div>
+<div class="profile">
+  <div>
+    <i class="material-icons show">account_circle</i>
+    <span class="user">Profile Name</span>
+  </div>
+  <div class="material-icons logout">logout</div>
+</div>
+<div class="cone"></div>

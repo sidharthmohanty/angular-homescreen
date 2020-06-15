@@ -1,0 +1,26 @@
+/* You can add global styles to this file, and also import other style files */
+:root {
+  --backURL: url("/assets/images/back1.jpg");
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-image: var(--backURL) !important;
+  /* background-color: gray; */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

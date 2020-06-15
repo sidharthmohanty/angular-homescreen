@@ -1,0 +1,58 @@
+<!--date time, temp, location-->
+<header>
+  <div class="sub-head header-text" *ngIf="dataAndTimeCheck">
+    <div>Time: {{ now | date: "HH:mm" }}</div>
+    <div>Date: {{ now | date }}</div>
+  </div>
+  <div class="sub-head" *ngIf="tempAndLocationCheck">
+    <div class="header-temp">
+      <mat-icon aria-hidden="false" aria-label="Example home icon">
+        cloud </mat-icon
+      >&nbsp; <span>30</span><sup>o</sup>
+    </div>
+    <div class="header-location">Bhubaneswar</div>
+  </div>
+</header>
+
+<!--body, question, input-->
+<div class="card">
+  <h1 class="body-htext" *ngIf="greetCheck">
+    Good Morning
+  </h1>
+  <div class="body-btext" *ngIf="questionCheck">
+    {{ question }}
+    <!-- </div>
+  <div class="add-body-btext">
+    {{ val }} -->
+    <span *ngIf="dtag" (click)="toggleInput()" class="close">&times;</span>
+  </div>
+  <div [style]="isQuestion">
+    <input
+      type="text"
+      class="inp"
+      size="30%"
+      (keyup.enter)="getVal($event)"
+      *ngIf="isDisplay"
+    />
+  </div>
+</div>
+
+<!--settings, fullscreen-->
+
+<footer>
+  <div class="footer-content">
+    <div class="header-text">
+      <span (click)="openModal()">
+        <i class="material-icons show">settings</i>
+      </span>
+    </div>
+    <div class="quote" *ngIf="quoteCheck">
+      "Feelings are just visitors. Let them come and go."
+    </div>
+    <div class="header-text">
+      <span class="material-icons show">
+        fullscreen
+      </span>
+    </div>
+  </div>
+</footer>

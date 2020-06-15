@@ -1,0 +1,136 @@
+header {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.sub-head {
+  padding: 20px 20px;
+  height: 40px;
+}
+
+.header-text {
+  color: white;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.header-temp {
+  color: white;
+  font-size: 25px;
+  font-weight: 400;
+  float: right;
+}
+
+.header-location {
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 70%;
+}
+
+.body-htext {
+  color: white;
+  font-size: 60px;
+}
+
+.body-btext {
+  text-align: center;
+  margin: 20px 0px;
+  color: white;
+  font-size: x-large;
+}
+
+.add-body-btext {
+  height: 30px;
+  text-align: center;
+  margin-top: 2%;
+  color: white;
+  font-size: x-large;
+}
+
+.inp {
+  border: 0;
+  outline: 0;
+  background-color: transparent;
+  border-bottom: 2px solid white;
+  text-align: center;
+  color: white;
+  font-size: x-large;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.footer-content {
+  margin: 55px 20px 20px 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.quote {
+  color: white;
+  font-style: italic;
+  font-weight: lighter;
+}
+
+.close {
+  margin-left: 20px;
+  font-weight: bold;
+}
+
+.close:hover {
+  cursor: pointer;
+  color: maroon;
+  transition: ease-in-out 0.3s;
+}
+
+.show {
+  font-size: 25px;
+}
+
+.show:hover {
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .quote {
+    display: none;
+  }
+  .body-htext {
+    color: white;
+    font-size: 30px;
+  }
+  .body-btext {
+    font-weight: normal;
+    margin: 25px 0 0 0;
+    font-size: 25px;
+    line-height: 1;
+  }
+
+  .card {
+    height: 75%;
+  }
+  .inp {
+    margin-top: 10%;
+  }
+
+  .show {
+    font-size: 50px;
+  }
+  .footer-content {
+    margin: 0px;
+  }
+}
