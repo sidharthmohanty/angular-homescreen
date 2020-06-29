@@ -26,29 +26,58 @@ export class HomeComponent implements OnInit {
   quoteCheck;
   dataAndTimeCheck;
   tempAndLocationCheck;
+  weather;
+  city;
+  clouds;
+  sunny;
+  temp;
+  viewTemp;
+  answer;
+  lat;
+  long;
+  elem = document.documentElement;
 
   constructor(
     public dialog: MatDialog,
     private eventEmitterService: EventEmitterService
   ) {
-    this.clickEventsubscription = this.eventEmitterService
-      .getClickEvent()
-      .subscribe(() => {
-        this.getToggleValues();
-      });
     setInterval(() => {
       this.now = Date.now();
     }, 1);
-    this.toggleData = this.eventEmitterService.getToggleData();
+  }
+  ngOnInit() {
+    this.eventEmitterService.toggleData.subscribe((response) => {
+      this.toggleData = response;
+      this.greetCheck = this.toggleData.greetings;
+      this.questionCheck = this.toggleData.question;
+      this.quoteCheck = this.toggleData.quote;
+      this.dataAndTimeCheck = this.toggleData.dataAndTime;
+      this.tempAndLocationCheck = this.toggleData.tempAndLocation;
+    });
+    this.eventEmitterService.getWeather().subscribe((data) => {
+      this.weather = data;
+      this.city = this.weather.name;
+      this.temp = Math.floor(this.weather.main.temp);
+      this.viewTemp = this.weather.weather[0].main;
+      if (this.viewTemp === 'Clouds') {
+        this.clouds = true;
+        this.sunny = false;
+      } else {
+        console.log(this.weather.weather.main);
+        this.clouds = false;
+        this.sunny = true;
+      }
+    });
+    this.toggleData = this.eventEmitterService.toggle;
     this.greetCheck = this.toggleData.greetings;
     this.questionCheck = this.toggleData.question;
     this.quoteCheck = this.toggleData.quote;
     this.dataAndTimeCheck = this.toggleData.dataAndTime;
     this.tempAndLocationCheck = this.toggleData.tempAndLocation;
   }
-  ngOnInit() {}
+
   getToggleValues() {
-    this.toggleData = this.eventEmitterService.getToggleData();
+    this.toggleData = this.eventEmitterService.toggle;
     this.greetCheck = this.toggleData.greetings;
     this.questionCheck = this.toggleData.question;
     this.quoteCheck = this.toggleData.quote;
@@ -56,16 +85,18 @@ export class HomeComponent implements OnInit {
     this.tempAndLocationCheck = this.toggleData.tempAndLocation;
   }
   getVal(item) {
-    this.question = item.target.value;
-    this.dtag = !this.dtag;
+    this.questionCheck = !this.questionCheck;
+    this.answer = item.target.value;
     this.isDisplay = 'visibility:hidden';
     item.target.value = '';
   }
 
   toggleInput() {
+    this.answer = '';
     this.isDisplay = '';
-    this.dtag = !this.dtag;
-    this.question = this.repeatQuestion;
+    this.dtag = false;
+    this.questionCheck = !this.questionCheck;
+    this.question = 'What is your main focus for today?';
   }
 
   openModal() {
@@ -73,5 +104,13 @@ export class HomeComponent implements OnInit {
     dialogConfig.autoFocus = true;
     dialogConfig.width = '40%';
     this.dialog.open(ModalComponent, dialogConfig);
+  }
+  toggleClose() {
+    this.dtag = true;
+  }
+  openFullscreen() {
+    if (this.elem.requestFullscreen) {
+      this.elem.requestFullscreen();
+    }
   }
 }

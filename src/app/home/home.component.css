@@ -30,12 +30,12 @@ header {
   font-weight: 500;
 }
 
-.card {
+.main-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  height: 70%;
+  height: 100%;
+  margin-top: calc(10rem + 20vh);
 }
 
 .body-htext {
@@ -45,7 +45,7 @@ header {
 
 .body-btext {
   text-align: center;
-  margin: 20px 0px;
+  margin-top: 2.5rem;
   color: white;
   font-size: x-large;
 }
@@ -89,6 +89,7 @@ footer {
 .close {
   margin-left: 20px;
   font-weight: bold;
+  color: white;
 }
 
 .close:hover {
@@ -120,7 +121,7 @@ footer {
     line-height: 1;
   }
 
-  .card {
+  .main-card {
     height: 75%;
   }
   .inp {

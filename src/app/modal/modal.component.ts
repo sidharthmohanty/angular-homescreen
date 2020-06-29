@@ -14,8 +14,10 @@ export class ModalComponent implements OnInit {
   quoteCheck;
   dataAndTimeCheck;
   tempAndLocationCheck;
-  constructor(private eventEmitterService: EventEmitterService) {
-    this.toggleData = this.eventEmitterService.getToggleData();
+  constructor(private eventEmitterService: EventEmitterService) {}
+
+  ngOnInit(): void {
+    this.toggleData = this.eventEmitterService.toggle;
     this.greetCheck = this.toggleData.greetings;
     this.questionCheck = this.toggleData.question;
     this.quoteCheck = this.toggleData.quote;
@@ -23,27 +25,7 @@ export class ModalComponent implements OnInit {
     this.tempAndLocationCheck = this.toggleData.tempAndLocation;
   }
 
-  ngOnInit(): void {}
-
-  toggleGreetings() {
-    this.toggleData.greetings = false;
-    this.eventEmitterService.sendClickEvent('greetings');
-    console.log(this.toggleData);
-  }
-  toggleQuestion() {
-    this.toggleData.question = false;
-    this.eventEmitterService.sendClickEvent('question');
-  }
-  toggleQuote() {
-    this.toggleData.quote = false;
-    this.eventEmitterService.sendClickEvent('quote');
-  }
-  toggleDateAndTime() {
-    this.toggleData.dataAndTime = false;
-    this.eventEmitterService.sendClickEvent('dataAndTime');
-  }
-  toggleTempAndLocation() {
-    this.toggleData.tempAndLocation = false;
-    this.eventEmitterService.sendClickEvent('tempAndLocation');
+  onToggleData(val) {
+    this.eventEmitterService.getToggleData(val);
   }
 }

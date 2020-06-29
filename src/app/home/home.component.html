@@ -1,38 +1,50 @@
 <!--date time, temp, location-->
 <header>
   <div class="sub-head header-text" *ngIf="dataAndTimeCheck">
-    <div>Time: {{ now | date: "HH:mm" }}</div>
+    <div>Time: {{ now | date: "h:mm aa" }}</div>
     <div>Date: {{ now | date }}</div>
   </div>
   <div class="sub-head" *ngIf="tempAndLocationCheck">
     <div class="header-temp">
-      <mat-icon aria-hidden="false" aria-label="Example home icon">
-        cloud </mat-icon
-      >&nbsp; <span>30</span><sup>o</sup>
+      <span *ngIf="clouds" class="mr-2">
+        <mat-icon aria-hidden="false" aria-label="Example home icon">
+          cloud
+        </mat-icon>
+      </span>
+      <span *ngIf="!clouds" class="mr-2">
+        <mat-icon aria-hidden="false" aria-label="Example home icon">
+          wb_sunny
+        </mat-icon>
+      </span>
+      <span>{{ temp }}</span
+      ><sup>o</sup>
     </div>
-    <div class="header-location">Bhubaneswar</div>
+    <div class="header-location">{{ city }}</div>
   </div>
 </header>
 
 <!--body, question, input-->
-<div class="card">
+<div class="main-card">
   <h1 class="body-htext" *ngIf="greetCheck">
-    Good Morning
+    Good morning, Sid!
   </h1>
-  <div class="body-btext" *ngIf="questionCheck">
-    {{ question }}
-    <!-- </div>
-  <div class="add-body-btext">
-    {{ val }} -->
+  <div class="body-btext">
+    <span *ngIf="questionCheck">
+      {{ question }}
+    </span>
+    <span *ngIf="!questionCheck" class="answer" (mouseover)="toggleClose()">
+      {{ answer }}
+    </span>
     <span *ngIf="dtag" (click)="toggleInput()" class="close">&times;</span>
   </div>
-  <div [style]="isQuestion">
+  <div class="mt-4">
     <input
+      [style]="isDisplay"
       type="text"
       class="inp"
       size="30%"
       (keyup.enter)="getVal($event)"
-      *ngIf="isDisplay"
+      *ngIf="questionCheck"
     />
   </div>
 </div>
@@ -50,7 +62,7 @@
       "Feelings are just visitors. Let them come and go."
     </div>
     <div class="header-text">
-      <span class="material-icons show">
+      <span class="material-icons show" (click)="openFullscreen()">
         fullscreen
       </span>
     </div>

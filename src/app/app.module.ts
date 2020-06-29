@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ModalComponent } from './modal/modal.component';
 import { EventEmitterService } from './event-emitter.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [AppComponent, HomeComponent, ModalComponent],
@@ -18,6 +19,7 @@ import { EventEmitterService } from './event-emitter.service';
     BrowserAnimationsModule,
     MatIconModule,
     MatDialogModule,
+    HttpClientModule,
   ],
   providers: [EventEmitterService],
   bootstrap: [AppComponent],
