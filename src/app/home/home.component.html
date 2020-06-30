@@ -1,21 +1,21 @@
 <!--date time, temp, location-->
 <header>
-  <div class="sub-head header-text" *ngIf="dataAndTimeCheck">
+  <div class="sub-head-1 header-text" *ngIf="dataAndTime">
     <div>Time: {{ now | date: "h:mm aa" }}</div>
     <div>Date: {{ now | date }}</div>
   </div>
-  <div class="sub-head" *ngIf="tempAndLocationCheck">
+  <div class="sub-head-2" *ngIf="tempAndLocation">
     <div class="header-temp">
-      <span *ngIf="clouds" class="mr-2">
+      <span class="mr-2">
         <mat-icon aria-hidden="false" aria-label="Example home icon">
           cloud
         </mat-icon>
       </span>
-      <span *ngIf="!clouds" class="mr-2">
+      <!-- <span *ngIf="!clouds" class="mr-2">
         <mat-icon aria-hidden="false" aria-label="Example home icon">
           wb_sunny
         </mat-icon>
-      </span>
+      </span> -->
       <span>{{ temp }}</span
       ><sup>o</sup>
     </div>
@@ -25,14 +25,15 @@
 
 <!--body, question, input-->
 <div class="main-card">
-  <h1 class="body-htext" *ngIf="greetCheck">
-    Good morning, Sid!
+  <h1 class="body-htext" *ngIf="greetings">
+    Good <span>{{ greetingLabel }}</span
+    >, {{ name }}!
   </h1>
   <div class="body-btext">
-    <span *ngIf="questionCheck">
-      {{ question }}
+    <span *ngIf="question">
+      {{ questionLabel }}
     </span>
-    <span *ngIf="!questionCheck" class="answer" (mouseover)="toggleClose()">
+    <span *ngIf="!question" class="answer" (mouseover)="toggleClose()">
       {{ answer }}
     </span>
     <span *ngIf="dtag" (click)="toggleInput()" class="close">&times;</span>
@@ -44,7 +45,7 @@
       class="inp"
       size="30%"
       (keyup.enter)="getVal($event)"
-      *ngIf="questionCheck"
+      *ngIf="question"
     />
   </div>
 </div>
@@ -58,13 +59,71 @@
         <i class="material-icons show">settings</i>
       </span>
     </div>
-    <div class="quote" *ngIf="quoteCheck">
-      "Feelings are just visitors. Let them come and go."
-    </div>
+    <div class="quote" *ngIf="quote">"{{ quoteLabel }}"</div>
     <div class="header-text">
-      <span class="material-icons show" (click)="openFullscreen()">
+      <span
+        *ngIf="fscreen"
+        class="material-icons show"
+        (click)="openFullscreen()"
+      >
         fullscreen
+      </span>
+      <span
+        *ngIf="!fscreen"
+        class="material-icons show"
+        (click)="closeFullscreen()"
+      >
+        close_fullscreen
       </span>
     </div>
   </div>
 </footer>
+
+<!--Modal-->
+
+<div
+  class="modal fade"
+  id="exampleModalCenter"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form [formGroup]="formTemplate" (submit)="onSubmit(formTemplate.value)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Upload image</h5>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <input
+              type="file"
+              formControlName="imageUrl"
+              id="imageUrl"
+              class="form-control"
+              accept="image/*"
+              (change)="uploadImage($event)"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Upload
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
