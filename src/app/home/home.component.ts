@@ -41,6 +41,7 @@ export class HomeComponent implements OnInit {
   long;
   fscreen;
   greetingLabel;
+  dataArray;
   data;
   name;
   quoteLabel;
@@ -70,13 +71,18 @@ export class HomeComponent implements OnInit {
   }
   elem;
   ngOnInit() {
-    // this.eventEmitterService.getImageList().subscribe((list) => {
-    //   this.imageList = list;
-    //   this.backgroundImage = this.imageList[this.imageList.length - 1].imageUrl;
-    // });
+    this.eventEmitterService.getImage().subscribe((list) => {
+      console.log(list);
+      // this.imageList = list;
+      // this.backgroundImage = this.imageList[this.imageList.length - 1].imageUrl;
+      // console.log(this.backgroundImage);
+    });
     this.resetForm();
-    this.eventEmitterService.getData().subscribe((items) => {
-      this.data = items[0];
+
+    this.eventEmitterService.getData().subscribe((itemsArray) => {
+      this.data = itemsArray[0].payload.doc.data();
+      this.data.id = itemsArray[0].payload.doc.id;
+      console.log(this.data);
       this.toggleData = this.data.toggleData;
       this.name = this.data.name;
       this.questionLabel = this.data.questionLabel;
@@ -224,7 +230,9 @@ export class HomeComponent implements OnInit {
           finalize(() => {
             fileRef.getDownloadURL().subscribe((url) => {
               formValue.imageUrl = url;
-              this.eventEmitterService.insertImage(formValue);
+              this.data.imageUrl = url;
+              this.eventEmitterService.updateImage(this.data.id, this.data);
+              // this.eventEmitterService.insertImage(formValue);
               this.resetForm();
             });
           })

@@ -10,25 +10,32 @@ import {
   providedIn: 'root',
 })
 export class EventEmitterService {
-  imageList: AngularFirestoreCollection<any>;
+  items: Observable<any>;
+  itemsRef: AngularFirestoreCollection<any>;
+
   toggleSubject = new Subject();
   toggleData = this.toggleSubject.asObservable();
-
-  weatherKey = '13a39e79ccfa4247489d476c1408f52d';
   url =
     'http://api.openweathermap.org/data/2.5/weather?q=bhubaneswar&appid=13a39e79ccfa4247489d476c1408f52d&units=metric';
   toggle = {};
 
-  constructor(private http: HttpClient, public db: AngularFirestore) {}
+  constructor(private http: HttpClient, public db: AngularFirestore) {
+    this.itemsRef = db.collection('1');
+    this.items = this.itemsRef.snapshotChanges();
+  }
   getImage() {
     return this.db.collection('imagelist').valueChanges();
   }
+  updateImage(id, data) {
+    this.db.doc(`1/${id}`).update(data);
+  }
 
   insertImage(image) {
-    this.imageList.add(image);
+    this.itemsRef.ref;
+    this.itemsRef.add(image);
   }
   getData() {
-    return this.db.collection('1').valueChanges();
+    return this.db.collection('1').snapshotChanges();
   }
 
   getToggleData(para) {
