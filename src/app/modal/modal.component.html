@@ -11,6 +11,7 @@
       data-toggle="modal"
       data-target="#exampleModalCenter"
       class="font-italic text-muted change-image"
+      *ngIf="ui"
     >
       Change background
     </a>
@@ -26,7 +27,7 @@
         <input
           type="checkbox"
           [checked]="greetCheck"
-          (click)="onToggleData('greetings')"
+          (click)="toggle('greetings')"
         />
         <span class="slider round"></span>
       </label>
@@ -42,7 +43,7 @@
         <input
           type="checkbox"
           [checked]="questionCheck"
-          (click)="onToggleData('question')"
+          (click)="toggle('question')"
         />
         <span class="slider round"></span>
       </label>
@@ -59,7 +60,7 @@
           type="checkbox"
           #greet
           [checked]="quoteCheck"
-          (click)="onToggleData('quote')"
+          (click)="toggle('quote')"
         />
         <span class="slider round"></span>
       </label>
@@ -75,7 +76,7 @@
         <input
           type="checkbox"
           [checked]="dataAndTimeCheck"
-          (click)="onToggleData('dataAndTime')"
+          (click)="toggle('dataAndTime')"
         />
         <span class="slider round"></span>
       </label>
@@ -91,18 +92,40 @@
         <input
           type="checkbox"
           [checked]="tempAndLocationCheck"
-          (click)="onToggleData('tempAndLocation')"
+          (click)="toggle('tempAndLocation')"
         />
         <span class="slider round"></span>
       </label>
     </span>
   </div>
 </div>
-<div class="profile">
-  <div>
-    <i class="material-icons show">account_circle</i>
-    <span class="user">Profile Name</span>
-  </div>
-  <div class="material-icons logout">logout</div>
+
+<div *ngIf="auth.user$ | async; then authenticated; else guest">
+  <!-- template will replace this div -->
 </div>
+
+<!-- User NOT logged in -->
+<ng-template #guest>
+  <div class="profile">
+    <div>
+      <i class="material-icons show">account_circle</i>
+      <span class="user">Profile Name</span>
+    </div>
+    <div class="material-icons logout" (click)="auth.googleSignin()">login</div>
+  </div>
+</ng-template>
+
+<!-- User logged in -->
+<ng-template #authenticated>
+  <div *ngIf="auth.user$ | async as user" class="profile">
+    <div>
+      <img
+        [src]="user.profilePhotoURL"
+        style="height: 45px; border-radius: 50%;"
+      />
+      <span class="user">{{ user.name }}</span>
+    </div>
+    <div class="material-icons logout" (click)="auth.signOut()">logout</div>
+  </div>
+</ng-template>
 <div class="cone"></div>

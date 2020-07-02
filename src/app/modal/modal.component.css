@@ -7,6 +7,9 @@
   left: 5px;
   bottom: 65px;
 }
+.material-icons {
+  cursor: pointer;
+}
 
 .mat-dialog-container {
   background-color: rgba(0, 0, 0, 0.9) !important;
@@ -91,7 +94,7 @@ input:checked + .slider:before {
 }
 
 .profile {
-  padding: 5px 10px 0px 10px;
+  padding: 5px 10px;
   background-color: #303030;
   display: flex;
   justify-content: space-between;
@@ -105,7 +108,7 @@ input:checked + .slider:before {
 .user {
   display: inline-table;
   vertical-align: top;
-  padding: 12px 10px;
+  padding: 10px 10px;
 }
 
 .logout {

@@ -2,11 +2,12 @@ import { DOCUMENT } from '@angular/common';
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ModalComponent } from '../modal/modal.component';
-import { EventEmitterService } from '../event-emitter.service';
-import { Subscription } from 'rxjs';
+import { DataService } from '../data.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AngularFireStorage } from '@angular/fire/storage';
-import { finalize } from 'rxjs/operators';
+import { finalize, first, tap } from 'rxjs/operators';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-home',
@@ -14,22 +15,27 @@ import { finalize } from 'rxjs/operators';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  clickEventsubscription: Subscription;
+  answerLabel: string;
+  id: string;
+  imageUrl: string;
+  name: string;
+  questionLabel;
+  quoteLabel;
+  toggleData;
+  tempAndLocation;
+  quote;
+  dataAndTime;
+  greetings;
+  question;
+  email: string;
+  profilePhotoURL: string;
 
-  public now: number;
+  now: number;
   isDisplay = '';
 
   val = '';
   dtag = false;
 
-  questionLabel;
-  repeatQuestion = 'What is your main focus for today?';
-  toggleData;
-  greetCheck;
-  questionCheck;
-  quoteCheck;
-  dataAndTimeCheck;
-  tempAndLocationCheck;
   weather;
   city;
   clouds;
@@ -43,56 +49,84 @@ export class HomeComponent implements OnInit {
   greetingLabel;
   dataArray;
   data;
-  name;
-  quoteLabel;
   imgSrc;
-  greetings;
-  dataAndTime;
-  question;
-  tempAndLocation;
-  quote;
   selectedImage;
   imageList;
   backgroundImage;
+  url;
+  ui = true;
+  elem = this.document.documentElement;
 
   formTemplate = new FormGroup({
     imageUrl: new FormControl('', Validators.required),
   });
 
   constructor(
+    public auth: AuthService,
+    private afAuth: AngularFireAuth,
     public storage: AngularFireStorage,
     @Inject(DOCUMENT) private document: any,
     public dialog: MatDialog,
-    private eventEmitterService: EventEmitterService
+    private dataService: DataService
   ) {
     setInterval(() => {
       this.now = Date.now();
     }, 1);
   }
-  elem;
   ngOnInit() {
-    this.eventEmitterService.getImage().subscribe((list) => {
-      console.log(list);
-      // this.imageList = list;
-      // this.backgroundImage = this.imageList[this.imageList.length - 1].imageUrl;
-      // console.log(this.backgroundImage);
-    });
     this.resetForm();
-
-    this.eventEmitterService.getData().subscribe((itemsArray) => {
-      this.data = itemsArray[0].payload.doc.data();
-      this.data.id = itemsArray[0].payload.doc.id;
-      console.log(this.data);
-      this.toggleData = this.data.toggleData;
-      this.name = this.data.name;
-      this.questionLabel = this.data.questionLabel;
-      this.quoteLabel = this.data.quoteLabel;
+    this.auth
+      .isLoggedIn()
+      .pipe(
+        tap((user) => {
+          if (user) {
+            this.ui = true;
+            this.dataService.getData(user.uid).subscribe((item) => {
+              this.data = item.payload.doc.data();
+              this.toggleData = this.data.toggleData;
+              this.name = this.data.name;
+              this.answerLabel = this.data.answerLabel;
+              this.questionLabel = this.data.questionLabel;
+              this.quoteLabel = this.data.quoteLabel;
+              this.greetings = this.toggleData.greetings;
+              this.dataAndTime = this.toggleData.dataAndTime;
+              this.question = this.toggleData.question;
+              this.tempAndLocation = this.toggleData.tempAndLocation;
+              this.quote = this.toggleData.quote;
+              this.url = this.data.imageUrl.replace(/['"]+/g, '');
+              this.document.body.style.backgroundImage = `url(${this.url})`;
+              if (this.answerLabel) {
+                this.question = false;
+              }
+            });
+          } else {
+            this.ui = false;
+            this.toggleData = this.dataService.toggleDataSource;
+            this.name = '';
+            this.answerLabel = '';
+            this.questionLabel = 'What is your main focus for today?';
+            this.quoteLabel =
+              'Feelings are just visitors. Let them come and go';
+            this.greetings = this.toggleData.greetings;
+            this.dataAndTime = this.toggleData.dataAndTime;
+            this.question = this.toggleData.question;
+            this.tempAndLocation = this.toggleData.tempAndLocation;
+            this.quote = this.toggleData.quote;
+            this.document.body.style.backgroundImage =
+              'url(https://firebasestorage.googleapis.com/v0/b/home-screen-b422f.appspot.com/o/images%2Fback2.jpg_1593577715597?alt=media&token=b3bce5fb-0e97-49e3-bfdf-65244b0fc74d)';
+          }
+        })
+      )
+      .subscribe();
+    this.dataService.toggleData.subscribe((response) => {
+      this.toggleData = response;
       this.greetings = this.toggleData.greetings;
-      this.dataAndTime = this.toggleData.dataAndTime;
       this.question = this.toggleData.question;
-      this.tempAndLocation = this.toggleData.tempAndLocation;
       this.quote = this.toggleData.quote;
+      this.dataAndTime = this.toggleData.dataAndTime;
+      this.tempAndLocation = this.toggleData.tempAndLocation;
     });
+
     const time = new Date().getHours();
     if (time < 10) {
       this.greetingLabel = 'morning';
@@ -107,16 +141,7 @@ export class HomeComponent implements OnInit {
       this.fscreen = false;
     }
 
-    // this.eventEmitterService.toggleData.subscribe((response) => {
-    //   this.toggleData = response;
-    //   this.greetCheck = this.toggleData.greetings;
-    //   this.questionCheck = this.toggleData.question;
-    //   this.quoteCheck = this.toggleData.quote;
-    //   this.dataAndTimeCheck = this.toggleData.dataAndTime;
-    //   this.tempAndLocationCheck = this.toggleData.tempAndLocation;
-    // });
-
-    this.eventEmitterService.getWeather().subscribe((data) => {
+    this.dataService.getWeather().subscribe((data) => {
       this.weather = data;
       this.city = this.weather.name;
       this.temp = Math.floor(this.weather.main.temp);
@@ -125,35 +150,14 @@ export class HomeComponent implements OnInit {
         this.clouds = true;
         this.sunny = false;
       } else {
-        console.log(this.weather.weather.main);
         this.clouds = false;
         this.sunny = true;
       }
     });
   }
-
-  getToggleValues() {
-    this.toggleData = this.eventEmitterService.toggle;
-    this.greetCheck = this.toggleData.greetings;
-    this.questionCheck = this.toggleData.question;
-    this.quoteCheck = this.toggleData.quote;
-    this.dataAndTimeCheck = this.toggleData.dataAndTime;
-    this.tempAndLocationCheck = this.toggleData.tempAndLocation;
-  }
-  getVal(item) {
-    this.questionCheck = !this.questionCheck;
-    this.answer = item.target.value;
-    this.isDisplay = 'visibility:hidden';
-    item.target.value = '';
-  }
-
-  toggleInput() {
-    this.answer = '';
-    this.isDisplay = '';
-    this.dtag = false;
-    this.questionCheck = !this.questionCheck;
-    this.question = 'What is your main focus for today?';
-  }
+  // getBackurl() {
+  //   return this.data.imageUrl;
+  // }
 
   openModal() {
     const dialogConfig = new MatDialogConfig();
@@ -161,6 +165,7 @@ export class HomeComponent implements OnInit {
     dialogConfig.width = '40%';
     this.dialog.open(ModalComponent, dialogConfig);
   }
+
   toggleClose() {
     this.dtag = true;
   }
@@ -205,6 +210,15 @@ export class HomeComponent implements OnInit {
     return this.formTemplate['controls'];
   }
 
+  // @HostListener('window:keydown', ['$event'])
+  // keyEvent(event) {
+  //   if (event.keyCode === 27) {
+  //     console.log(window.innerHeight);
+  //     console.log(screen.height);
+  //     console.log('yeahhhh');
+  //   }
+  // }
+
   uploadImage(event) {
     if (event.target.files && event.target.files[0]) {
       const reader = new FileReader();
@@ -231,7 +245,7 @@ export class HomeComponent implements OnInit {
             fileRef.getDownloadURL().subscribe((url) => {
               formValue.imageUrl = url;
               this.data.imageUrl = url;
-              this.eventEmitterService.updateImage(this.data.id, this.data);
+              this.dataService.updateData(this.data.id, this.data);
               // this.eventEmitterService.insertImage(formValue);
               this.resetForm();
             });
@@ -242,5 +256,14 @@ export class HomeComponent implements OnInit {
   }
   resetForm() {
     this.formTemplate.reset();
+  }
+  updateAns(event) {
+    this.data.answerLabel = event.target.value;
+    this.dataService.updateData(this.data.id, this.data);
+  }
+  deleteAns() {
+    this.dtag = false;
+    this.data.answerLabel = '';
+    this.dataService.updateData(this.data.id, this.data);
   }
 }

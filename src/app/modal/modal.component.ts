@@ -1,5 +1,9 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { EventEmitterService } from '../event-emitter.service';
+import { DataService } from '../data.service';
+import { AuthService } from '../auth.service';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { tap } from 'rxjs/operators';
+import { pipe } from 'rxjs';
 
 @Component({
   selector: 'app-modal',
@@ -14,22 +18,59 @@ export class ModalComponent implements OnInit {
   quoteCheck;
   dataAndTimeCheck;
   tempAndLocationCheck;
-  mainData;
-  constructor(private eventEmitterService: EventEmitterService) {}
+  data;
+  ui;
+  constructor(
+    public dataService: DataService,
+    public auth: AuthService,
+    public afAuth: AngularFireAuth
+  ) {}
+  ngOnInit() {
+    this.auth
+      .isLoggedIn()
+      .pipe(
+        tap((user) => {
+          if (user) {
+            this.dataService.getData(user.uid).subscribe((item) => {
+              this.data = item.payload.doc.data();
+              this.toggleData = this.data.toggleData;
+              this.greetCheck = this.toggleData.greetings;
+              this.questionCheck = this.toggleData.question;
+              this.quoteCheck = this.toggleData.quote;
+              this.dataAndTimeCheck = this.toggleData.dataAndTime;
+              this.tempAndLocationCheck = this.toggleData.tempAndLocation;
+            });
+          } else {
+            this.toggleData = this.dataService.toggleDataSource;
+            console.log(this.toggleData);
+            this.greetCheck = this.toggleData.greetings;
+            this.questionCheck = this.toggleData.question;
+            this.quoteCheck = this.toggleData.quote;
+            this.dataAndTimeCheck = this.toggleData.dataAndTime;
+            this.tempAndLocationCheck = this.toggleData.tempAndLocation;
+          }
+        })
+      )
+      .subscribe();
+  }
 
-  ngOnInit(): void {
-    this.eventEmitterService.getData().subscribe((data) => {
-      this.mainData = data;
-      this.toggleData = this.mainData[0].toggleData;
-      this.greetCheck = this.toggleData.greetings;
-      this.questionCheck = this.toggleData.question;
-      this.quoteCheck = this.toggleData.quote;
-      this.dataAndTimeCheck = this.toggleData.dataAndTime;
-      this.tempAndLocationCheck = this.toggleData.tempAndLocation;
-    });
+  toggle(val) {
+    this.auth
+      .isLoggedIn()
+      .pipe(
+        tap((user) => {
+          if (user) {
+            this.onToggleData(val);
+          } else {
+            this.dataService.localDataToggle(val);
+          }
+        })
+      )
+      .subscribe();
   }
 
   onToggleData(val) {
-    this.eventEmitterService.getToggleData(val);
+    this.data.toggleData[val] = !this.data.toggleData[val];
+    this.dataService.updateData(this.data.id, this.data);
   }
 }

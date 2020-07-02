@@ -52,7 +52,7 @@ header {
 
 .body-htext {
   color: white;
-  font-size: 60px;
+  font-size: calc(2rem + 3vh);
 }
 
 .body-btext {

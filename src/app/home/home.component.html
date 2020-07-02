@@ -34,9 +34,9 @@
       {{ questionLabel }}
     </span>
     <span *ngIf="!question" class="answer" (mouseover)="toggleClose()">
-      {{ answer }}
+      {{ answerLabel }}
     </span>
-    <span *ngIf="dtag" (click)="toggleInput()" class="close">&times;</span>
+    <span *ngIf="dtag" (click)="deleteAns()" class="close">&times;</span>
   </div>
   <div class="mt-4">
     <input
@@ -44,7 +44,7 @@
       type="text"
       class="inp"
       size="30%"
-      (keyup.enter)="getVal($event)"
+      (keyup.enter)="updateAns($event)"
       *ngIf="question"
     />
   </div>

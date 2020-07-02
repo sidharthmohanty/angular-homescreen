@@ -5,11 +5,21 @@ import {
   AngularFirestore,
   AngularFirestoreCollection,
 } from '@angular/fire/firestore';
+import { flatMap, first, tap } from 'rxjs/operators';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root',
 })
-export class EventEmitterService {
+export class DataService {
+  toggleDataSource = {
+    greetings: true,
+    question: true,
+    quote: true,
+    dataAndTime: true,
+    tempAndLocation: true,
+  };
+
   items: Observable<any>;
   itemsRef: AngularFirestoreCollection<any>;
 
@@ -19,23 +29,27 @@ export class EventEmitterService {
     'http://api.openweathermap.org/data/2.5/weather?q=bhubaneswar&appid=13a39e79ccfa4247489d476c1408f52d&units=metric';
   toggle = {};
 
-  constructor(private http: HttpClient, public db: AngularFirestore) {
-    this.itemsRef = db.collection('1');
+  constructor(
+    private http: HttpClient,
+    public db: AngularFirestore,
+    private afAuth: AngularFireAuth
+  ) {
+    this.itemsRef = db.collection('users');
     this.items = this.itemsRef.snapshotChanges();
   }
-  getImage() {
-    return this.db.collection('imagelist').valueChanges();
-  }
-  updateImage(id, data) {
-    this.db.doc(`1/${id}`).update(data);
+
+  updateData(id, data) {
+    this.db.doc(`users/${id}`).update(data);
   }
 
   insertImage(image) {
-    this.itemsRef.ref;
     this.itemsRef.add(image);
   }
-  getData() {
-    return this.db.collection('1').snapshotChanges();
+  getData(id) {
+    return this.db
+      .collection('users', (ref) => ref.where('id', '==', id).limit(1))
+      .snapshotChanges()
+      .pipe(flatMap((users) => users));
   }
 
   getToggleData(para) {
@@ -45,5 +59,10 @@ export class EventEmitterService {
 
   getWeather() {
     return this.http.get(this.url);
+  }
+
+  localDataToggle(val) {
+    this.toggleDataSource[val] = !this.toggleDataSource[val];
+    this.toggleSubject.next(this.toggle);
   }
 }
