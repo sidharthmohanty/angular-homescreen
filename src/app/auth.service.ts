@@ -53,6 +53,7 @@ export class AuthService {
       name: user.displayName,
       questionLabel: 'What is your main focus for today?',
       quoteLabel: 'Feelings are just visitors. Let them come and go',
+      role: 'user',
       toggleData: {
         tempAndLocation: true,
         quote: true,

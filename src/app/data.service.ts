@@ -27,7 +27,6 @@ export class DataService {
   toggleData = this.toggleSubject.asObservable();
   url =
     'http://api.openweathermap.org/data/2.5/weather?q=bhubaneswar&appid=13a39e79ccfa4247489d476c1408f52d&units=metric';
-  toggle = {};
 
   constructor(
     private http: HttpClient,
@@ -41,6 +40,9 @@ export class DataService {
   updateData(id, data) {
     this.db.doc(`users/${id}`).update(data);
   }
+  updateAdmin(id, data) {
+    this.db.doc(`admin/${id}`).update(data);
+  }
 
   insertImage(image) {
     this.itemsRef.add(image);
@@ -52,9 +54,8 @@ export class DataService {
       .pipe(flatMap((users) => users));
   }
 
-  getToggleData(para) {
-    this.toggle[para] = !this.toggle[para];
-    this.toggleSubject.next(this.toggle);
+  getAdmin() {
+    return this.db.collection('admin').snapshotChanges();
   }
 
   getWeather() {
@@ -63,6 +64,7 @@ export class DataService {
 
   localDataToggle(val) {
     this.toggleDataSource[val] = !this.toggleDataSource[val];
-    this.toggleSubject.next(this.toggle);
+
+    this.toggleSubject.next(this.toggleDataSource);
   }
 }

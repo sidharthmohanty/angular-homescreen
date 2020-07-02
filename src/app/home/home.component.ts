@@ -1,13 +1,17 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ModalComponent } from '../modal/modal.component';
 import { DataService } from '../data.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { AngularFireStorage } from '@angular/fire/storage';
+import {
+  AngularFireStorage,
+  AngularFireUploadTask,
+} from '@angular/fire/storage';
 import { finalize, first, tap } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AuthService } from '../auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +19,12 @@ import { AuthService } from '../auth.service';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
+  @ViewChild('que') que;
+  @ViewChild('quo') quo;
+
+  uploadProgress: Observable<number>;
+  task: AngularFireUploadTask;
+
   answerLabel: string;
   id: string;
   imageUrl: string;
@@ -24,11 +34,15 @@ export class HomeComponent implements OnInit {
   toggleData;
   tempAndLocation;
   quote;
-  dataAndTime;
+  dateAndTime;
   greetings;
   question;
   email: string;
   profilePhotoURL: string;
+  ubar = false;
+  saveBtn = false;
+  quoSaveBtn = false;
+  queSaveBtn = false;
 
   now: number;
   isDisplay = '';
@@ -56,6 +70,10 @@ export class HomeComponent implements OnInit {
   url;
   ui = true;
   elem = this.document.documentElement;
+  subBtn = true;
+  canBtn = true;
+  inpField = true;
+  role;
 
   formTemplate = new FormGroup({
     imageUrl: new FormControl('', Validators.required),
@@ -82,14 +100,55 @@ export class HomeComponent implements OnInit {
           if (user) {
             this.ui = true;
             this.dataService.getData(user.uid).subscribe((item) => {
-              this.data = item.payload.doc.data();
+              this.role = item.payload.doc.data()['role'];
+              this.name = item.payload.doc.data()['name'];
+              if (this.role === 'user') {
+                this.data = item.payload.doc.data();
+                this.toggleData = this.data.toggleData;
+                this.name = this.data.name;
+                this.answerLabel = this.data.answerLabel;
+                this.questionLabel = this.data.questionLabel;
+                this.quoteLabel = this.data.quoteLabel;
+                this.greetings = this.toggleData.greetings;
+                this.dateAndTime = this.toggleData.dateAndTime;
+                this.question = this.toggleData.question;
+                this.tempAndLocation = this.toggleData.tempAndLocation;
+                this.quote = this.toggleData.quote;
+                this.url = this.data.imageUrl.replace(/['"]+/g, '');
+                this.document.body.style.backgroundImage = `url(${this.url})`;
+                if (this.answerLabel) {
+                  this.question = false;
+                }
+              } else {
+                this.dataService.getAdmin().subscribe((el) => {
+                  this.data = el[0].payload.doc.data();
+                  this.toggleData = this.data.toggleData;
+                  this.answerLabel = this.data.answerLabel;
+                  this.questionLabel = this.data.questionLabel;
+                  this.quoteLabel = this.data.quoteLabel;
+                  this.greetings = this.toggleData.greetings;
+                  this.dateAndTime = this.toggleData.dateAndTime;
+                  this.question = this.toggleData.question;
+                  this.tempAndLocation = this.toggleData.tempAndLocation;
+                  this.quote = this.toggleData.quote;
+                  this.url = this.data.imageUrl.replace(/['"]+/g, '');
+                  this.document.body.style.backgroundImage = `url(${this.url})`;
+                  if (this.answerLabel) {
+                    this.question = false;
+                  }
+                });
+              }
+            });
+          } else {
+            this.ui = false;
+            this.dataService.getAdmin().subscribe((el) => {
+              this.data = el[0].payload.doc.data();
               this.toggleData = this.data.toggleData;
-              this.name = this.data.name;
               this.answerLabel = this.data.answerLabel;
               this.questionLabel = this.data.questionLabel;
               this.quoteLabel = this.data.quoteLabel;
               this.greetings = this.toggleData.greetings;
-              this.dataAndTime = this.toggleData.dataAndTime;
+              this.dateAndTime = this.toggleData.dateAndTime;
               this.question = this.toggleData.question;
               this.tempAndLocation = this.toggleData.tempAndLocation;
               this.quote = this.toggleData.quote;
@@ -99,21 +158,6 @@ export class HomeComponent implements OnInit {
                 this.question = false;
               }
             });
-          } else {
-            this.ui = false;
-            this.toggleData = this.dataService.toggleDataSource;
-            this.name = '';
-            this.answerLabel = '';
-            this.questionLabel = 'What is your main focus for today?';
-            this.quoteLabel =
-              'Feelings are just visitors. Let them come and go';
-            this.greetings = this.toggleData.greetings;
-            this.dataAndTime = this.toggleData.dataAndTime;
-            this.question = this.toggleData.question;
-            this.tempAndLocation = this.toggleData.tempAndLocation;
-            this.quote = this.toggleData.quote;
-            this.document.body.style.backgroundImage =
-              'url(https://firebasestorage.googleapis.com/v0/b/home-screen-b422f.appspot.com/o/images%2Fback2.jpg_1593577715597?alt=media&token=b3bce5fb-0e97-49e3-bfdf-65244b0fc74d)';
           }
         })
       )
@@ -123,7 +167,7 @@ export class HomeComponent implements OnInit {
       this.greetings = this.toggleData.greetings;
       this.question = this.toggleData.question;
       this.quote = this.toggleData.quote;
-      this.dataAndTime = this.toggleData.dataAndTime;
+      this.dateAndTime = this.toggleData.dateAndTime;
       this.tempAndLocation = this.toggleData.tempAndLocation;
     });
 
@@ -166,9 +210,6 @@ export class HomeComponent implements OnInit {
     this.dialog.open(ModalComponent, dialogConfig);
   }
 
-  toggleClose() {
-    this.dtag = true;
-  }
   openFullscreen() {
     if (this.elem.requestFullscreen) {
       this.fscreen = !this.fscreen;
@@ -215,7 +256,6 @@ export class HomeComponent implements OnInit {
   //   if (event.keyCode === 27) {
   //     console.log(window.innerHeight);
   //     console.log(screen.height);
-  //     console.log('yeahhhh');
   //   }
   // }
 
@@ -225,45 +265,171 @@ export class HomeComponent implements OnInit {
       reader.onload = (e) => (this.imgSrc = e.target.result);
       reader.readAsDataURL(event.target.files[0]);
       this.selectedImage = event.target.files[0];
+      this.subBtn = !this.subBtn;
     } else {
       this.imgSrc = '';
       this.selectedImage = null;
+      this.subBtn = !this.subBtn;
     }
   }
 
   onSubmit(formValue) {
     if (this.formTemplate.valid) {
-      const filePath = `images/${
-        this.selectedImage.name
-      }_${new Date().getTime()}`;
-      const fileRef = this.storage.ref(filePath);
-      this.storage
-        .upload(filePath, this.selectedImage)
-        .snapshotChanges()
-        .pipe(
-          finalize(() => {
-            fileRef.getDownloadURL().subscribe((url) => {
-              formValue.imageUrl = url;
-              this.data.imageUrl = url;
-              this.dataService.updateData(this.data.id, this.data);
-              // this.eventEmitterService.insertImage(formValue);
-              this.resetForm();
-            });
-          })
-        )
-        .subscribe();
+      this.auth.isLoggedIn().pipe(
+        tap((user) => {
+          if (user) {
+            this.ubar = !this.ubar;
+            const filePath = `images/${
+              this.selectedImage.name
+            }_${new Date().getTime()}`;
+            const fileRef = this.storage.ref(filePath);
+            this.task = this.storage.upload(filePath, this.selectedImage);
+            this.uploadProgress = this.task.percentageChanges();
+            this.inpField = !this.inpField;
+            this.subBtn = !this.subBtn;
+            this.canBtn = !this.canBtn;
+            if (this.role === 'user') {
+              this.task
+                .snapshotChanges()
+                .pipe(
+                  finalize(() => {
+                    fileRef.getDownloadURL().subscribe((url) => {
+                      formValue.imageUrl = url;
+                      this.data.imageUrl = url;
+                      this.dataService.updateData(this.data.id, this.data);
+                      this.resetForm();
+                      this.ubar = !this.ubar;
+                    });
+                  })
+                )
+                .subscribe();
+            } else {
+              this.task
+                .snapshotChanges()
+                .pipe(
+                  finalize(() => {
+                    fileRef.getDownloadURL().subscribe((url) => {
+                      formValue.imageUrl = url;
+                      this.data.imageUrl = url;
+                      this.dataService.updateAdmin(this.data.id, this.data);
+                      this.resetForm();
+                      this.ubar = !this.ubar;
+                    });
+                  })
+                )
+                .subscribe();
+            }
+          } else {
+            console.log('You are not logged in');
+          }
+        })
+      );
+    } else {
+      console.log('not valid');
     }
+  }
+  handleUpload(event) {
+    console.log(event.target);
+  }
+
+  cancel() {
+    this.task.cancel();
+    this.resetForm();
+    this.canBtn = !this.canBtn;
   }
   resetForm() {
     this.formTemplate.reset();
   }
+
   updateAns(event) {
-    this.data.answerLabel = event.target.value;
-    this.dataService.updateData(this.data.id, this.data);
+    this.auth
+      .isLoggedIn()
+      .pipe(
+        tap((user) => {
+          this.answerLabel = event.target.value;
+          this.dtag = !this.dtag;
+          if (user) {
+            if (this.role === 'user') {
+              this.data.answerLabel = event.target.value;
+              this.dataService.updateData(this.data.id, this.data);
+            } else {
+              this.data.answerLabel = event.target.value;
+              this.dataService.updateAdmin(this.data.id, this.data);
+            }
+          } else {
+            this.question = !this.question;
+          }
+        })
+      )
+      .subscribe();
   }
   deleteAns() {
     this.dtag = false;
-    this.data.answerLabel = '';
-    this.dataService.updateData(this.data.id, this.data);
+    this.auth
+      .isLoggedIn()
+      .pipe(
+        tap((user) => {
+          if (user) {
+            this.data.answerLabel = '';
+            if (this.role === 'user') {
+              this.dataService.updateData(this.data.id, this.data);
+            } else {
+              this.dataService.updateAdmin(this.data.id, this.data);
+            }
+          } else {
+            this.answerLabel = '';
+            this.question = !this.question;
+          }
+        })
+      )
+      .subscribe();
+  }
+  toggleSaveQue() {
+    this.queSaveBtn = true;
+  }
+  toggleSaveQuo() {
+    this.quoSaveBtn = true;
+  }
+  updateQuestion() {
+    this.auth
+      .isLoggedIn()
+      .pipe(
+        tap((user) => {
+          this.questionLabel = this.que.nativeElement.innerText;
+          if (user) {
+            this.data.questionLabel = this.que.nativeElement.innerText;
+            if (this.role === 'user') {
+              this.dataService.updateData(this.data.id, this.data);
+            } else {
+              this.dataService.updateAdmin(this.data.id, this.data);
+            }
+          }
+        })
+      )
+      .subscribe();
+    this.queSaveBtn = false;
+  }
+  updateQuote() {
+    this.auth
+      .isLoggedIn()
+      .pipe(
+        tap((user) => {
+          this.quoteLabel = this.quo.nativeElement.innerText;
+          if (user) {
+            this.data.quoteLabel = this.quo.nativeElement.innerText;
+            if (this.role === 'user') {
+              this.dataService.updateData(this.data.id, this.data);
+            } else {
+              this.dataService.updateAdmin(this.data.id, this.data);
+            }
+          }
+        })
+      )
+      .subscribe();
+    this.quoSaveBtn = false;
+  }
+  cancelEdit() {
+    this.quoSaveBtn = false;
+    this.queSaveBtn = false;
   }
 }

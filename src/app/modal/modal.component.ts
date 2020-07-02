@@ -3,7 +3,6 @@ import { DataService } from '../data.service';
 import { AuthService } from '../auth.service';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { tap } from 'rxjs/operators';
-import { pipe } from 'rxjs';
 
 @Component({
   selector: 'app-modal',
@@ -13,13 +12,15 @@ import { pipe } from 'rxjs';
 })
 export class ModalComponent implements OnInit {
   toggleData;
-  greetCheck;
-  questionCheck;
-  quoteCheck;
-  dataAndTimeCheck;
-  tempAndLocationCheck;
+  greetings;
+  question;
+  quote;
+  dateAndTime;
+  tempAndLocation;
   data;
-  ui;
+  admin;
+  role;
+
   constructor(
     public dataService: DataService,
     public auth: AuthService,
@@ -32,22 +33,38 @@ export class ModalComponent implements OnInit {
         tap((user) => {
           if (user) {
             this.dataService.getData(user.uid).subscribe((item) => {
-              this.data = item.payload.doc.data();
-              this.toggleData = this.data.toggleData;
-              this.greetCheck = this.toggleData.greetings;
-              this.questionCheck = this.toggleData.question;
-              this.quoteCheck = this.toggleData.quote;
-              this.dataAndTimeCheck = this.toggleData.dataAndTime;
-              this.tempAndLocationCheck = this.toggleData.tempAndLocation;
+              this.role = item.payload.doc.data()['role'];
+              if (this.role === 'user') {
+                this.data = item.payload.doc.data();
+                this.toggleData = this.data.toggleData;
+                this.greetings = this.toggleData.greetings;
+                this.dateAndTime = this.toggleData.dateAndTime;
+                this.question = this.toggleData.question;
+                this.tempAndLocation = this.toggleData.tempAndLocation;
+                this.quote = this.toggleData.quote;
+              } else {
+                this.dataService.getAdmin().subscribe((el) => {
+                  this.data = el[0].payload.doc.data();
+                  this.toggleData = this.data.toggleData;
+                  this.greetings = this.toggleData.greetings;
+                  this.dateAndTime = this.toggleData.dateAndTime;
+                  this.question = this.toggleData.question;
+                  this.tempAndLocation = this.toggleData.tempAndLocation;
+                  this.quote = this.toggleData.quote;
+                  this.admin = true;
+                });
+              }
             });
           } else {
-            this.toggleData = this.dataService.toggleDataSource;
-            console.log(this.toggleData);
-            this.greetCheck = this.toggleData.greetings;
-            this.questionCheck = this.toggleData.question;
-            this.quoteCheck = this.toggleData.quote;
-            this.dataAndTimeCheck = this.toggleData.dataAndTime;
-            this.tempAndLocationCheck = this.toggleData.tempAndLocation;
+            this.dataService.getAdmin().subscribe((el) => {
+              this.data = el[0].payload.doc.data();
+              this.toggleData = this.data.toggleData;
+              this.greetings = this.toggleData.greetings;
+              this.dateAndTime = this.toggleData.dateAndTime;
+              this.question = this.toggleData.question;
+              this.tempAndLocation = this.toggleData.tempAndLocation;
+              this.quote = this.toggleData.quote;
+            });
           }
         })
       )
@@ -60,17 +77,17 @@ export class ModalComponent implements OnInit {
       .pipe(
         tap((user) => {
           if (user) {
-            this.onToggleData(val);
+            this.data.toggleData[val] = !this.data.toggleData[val];
+            if (this.role === 'user') {
+              this.dataService.updateData(this.data.id, this.data);
+            } else {
+              this.dataService.updateAdmin(this.data.id, this.data);
+            }
           } else {
             this.dataService.localDataToggle(val);
           }
         })
       )
       .subscribe();
-  }
-
-  onToggleData(val) {
-    this.data.toggleData[val] = !this.data.toggleData[val];
-    this.dataService.updateData(this.data.id, this.data);
   }
 }

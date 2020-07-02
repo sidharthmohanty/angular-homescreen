@@ -1,6 +1,6 @@
 <!--date time, temp, location-->
 <header>
-  <div class="sub-head-1 header-text" *ngIf="dataAndTime">
+  <div class="sub-head-1 header-text" *ngIf="dateAndTime">
     <div>Time: {{ now | date: "h:mm aa" }}</div>
     <div>Date: {{ now | date }}</div>
   </div>
@@ -26,17 +26,34 @@
 <!--body, question, input-->
 <div class="main-card">
   <h1 class="body-htext" *ngIf="greetings">
-    Good <span>{{ greetingLabel }}</span
-    >, {{ name }}!
+    Good <span>{{ greetingLabel }} {{ name }}</span> !
   </h1>
   <div class="body-btext">
-    <span *ngIf="question">
+    <div
+      *ngIf="question"
+      contenteditable="true"
+      #que
+      (click)="toggleSaveQue()"
+      class="question"
+    >
       {{ questionLabel }}
-    </span>
-    <span *ngIf="!question" class="answer" (mouseover)="toggleClose()">
+    </div>
+    <span
+      class="saveQuestion badge badge-pill badge-light"
+      *ngIf="queSaveBtn"
+      (click)="updateQuestion()"
+      >save</span
+    ><span
+      *ngIf="queSaveBtn"
+      class="saveQuestion badge badge-pill badge-danger ml-1"
+      (click)="cancelEdit()"
+      >cancel</span
+    >
+
+    <div *ngIf="!question" class="answer">
       {{ answerLabel }}
-    </span>
-    <span *ngIf="dtag" (click)="deleteAns()" class="close">&times;</span>
+    </div>
+    <div *ngIf="dtag" (click)="deleteAns()" class="close-btn">&times;</div>
   </div>
   <div class="mt-4">
     <input
@@ -59,7 +76,28 @@
         <i class="material-icons show">settings</i>
       </span>
     </div>
-    <div class="quote" *ngIf="quote">"{{ quoteLabel }}"</div>
+    <div>
+      <span
+        class="quote"
+        *ngIf="quote"
+        contenteditable="true"
+        #quo
+        (click)="toggleSaveQuo()"
+        >"{{ quoteLabel }}"</span
+      >
+      <span
+        *ngIf="quoSaveBtn"
+        class="saveQuote badge badge-pill badge-light"
+        (click)="updateQuote()"
+        >save</span
+      >
+      <span
+        *ngIf="quoSaveBtn"
+        class="saveQuote badge badge-pill badge-danger ml-1"
+        (click)="cancelEdit()"
+        >cancel</span
+      >
+    </div>
     <div class="header-text">
       <span
         *ngIf="fscreen"
@@ -93,7 +131,7 @@
     <div class="modal-content">
       <form [formGroup]="formTemplate" (submit)="onSubmit(formTemplate.value)">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Upload image</h5>
+          <div class="modal-title" id="exampleModalLongTitle">Upload image</div>
           <button
             type="button"
             class="close"
@@ -105,6 +143,26 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
+            <div *ngIf="ubar">
+              <div
+                class="progress"
+                *ngIf="uploadProgress | async as progress; let up"
+              >
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  area-value="up"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  (change)="handleUpload($event)"
+                  [ngStyle]="{ width: progress + '%' }"
+                >
+                  {{ progress | number }} %
+                </div>
+                <div class="progress-bar progress-bar-animated"></div>
+              </div>
+            </div>
+
             <input
               type="file"
               formControlName="imageUrl"
@@ -112,14 +170,20 @@
               class="form-control"
               accept="image/*"
               (change)="uploadImage($event)"
+              *ngIf="!ubar"
             />
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Close
-          </button>
-          <button type="submit" class="btn btn-primary">
+          <!-- <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cancel()"
+            [disabled]="canBtn"
+          >
+            Cancel
+          </button> -->
+          <button type="submit" class="btn btn-primary" [disabled]="subBtn">
             Upload
           </button>
         </div>

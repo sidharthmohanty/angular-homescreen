@@ -1,7 +1,14 @@
 <div>
   <div class="modal-head">
-    <h1 class="head-text">General</h1>
-    <span mat-dialog-close class="close">&times;</span>
+    <div>
+      <h1 class="head-text">General</h1>
+    </div>
+    <div>
+      <span class="font-italic text-muted" *ngIf="admin">
+        Admin
+      </span>
+      <span mat-dialog-close class="close-btn">&times;</span>
+    </div>
   </div>
   <div class="d-flex justify-content-between">
     <p class="sub-heading">Customize your dashboard !!</p>
@@ -11,7 +18,6 @@
       data-toggle="modal"
       data-target="#exampleModalCenter"
       class="font-italic text-muted change-image"
-      *ngIf="ui"
     >
       Change background
     </a>
@@ -26,7 +32,7 @@
       <label class="switch">
         <input
           type="checkbox"
-          [checked]="greetCheck"
+          [checked]="greetings"
           (click)="toggle('greetings')"
         />
         <span class="slider round"></span>
@@ -42,7 +48,7 @@
       <label class="switch">
         <input
           type="checkbox"
-          [checked]="questionCheck"
+          [checked]="question"
           (click)="toggle('question')"
         />
         <span class="slider round"></span>
@@ -59,7 +65,7 @@
         <input
           type="checkbox"
           #greet
-          [checked]="quoteCheck"
+          [checked]="quote"
           (click)="toggle('quote')"
         />
         <span class="slider round"></span>
@@ -75,8 +81,8 @@
       <label class="switch">
         <input
           type="checkbox"
-          [checked]="dataAndTimeCheck"
-          (click)="toggle('dataAndTime')"
+          [checked]="dateAndTime"
+          (click)="toggle('dateAndTime')"
         />
         <span class="slider round"></span>
       </label>
@@ -91,7 +97,7 @@
       <label class="switch">
         <input
           type="checkbox"
-          [checked]="tempAndLocationCheck"
+          [checked]="tempAndLocation"
           (click)="toggle('tempAndLocation')"
         />
         <span class="slider round"></span>

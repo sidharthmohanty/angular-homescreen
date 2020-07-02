@@ -124,14 +124,14 @@ input:checked + .slider:before {
   left: 15px;
 }
 
-.close {
+.close-btn {
   color: white;
   margin-left: 20px;
   font-weight: bold;
   font-size: 25px;
 }
 
-.close:hover {
+.close-btn:hover {
   cursor: pointer;
   color: maroon;
   transition: ease-in-out 0.3s;
@@ -140,6 +140,12 @@ input:checked + .slider:before {
 .modal-head {
   display: flex;
   justify-content: space-between;
+}
+.form-control {
+  height: auto !important;
+}
+.modal-title {
+  font-size: 1rem;
 }
 .change-image {
   cursor: pointer;
