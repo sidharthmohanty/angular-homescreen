@@ -9,6 +9,9 @@ import {
 
 import { Observable, of } from 'rxjs';
 import { switchMap, first } from 'rxjs/operators';
+import { DataService } from './data.service';
+import { Router } from '@angular/router';
+import { HomeComponent } from './home/home.component';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +19,12 @@ import { switchMap, first } from 'rxjs/operators';
 export class AuthService {
   user$: Observable<User>;
 
-  constructor(private afAuth: AngularFireAuth, private afs: AngularFirestore) {
+  constructor(
+    private router: Router,
+    private afAuth: AngularFireAuth,
+    private afs: AngularFirestore,
+    private dataService: DataService
+  ) {
     this.user$ = this.afAuth.authState.pipe(
       switchMap((user) => {
         // Logged in
@@ -37,6 +45,9 @@ export class AuthService {
     const provider = new auth.GoogleAuthProvider();
     const credential = await this.afAuth.signInWithPopup(provider);
     window.location.reload();
+    // this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+    //   this.router.navigate(['HomeComponent']);
+    // });
     return this.updateUserData(credential.user);
   }
   private updateUserData(user) {
@@ -49,7 +60,7 @@ export class AuthService {
       id: user.uid,
       answerLabel: '',
       imageUrl:
-        'https://firebasestorage.googleapis.com/v0/b/home-screen-b422f.appspot.com/o/images%2Fback2.jpg_1593577715597?alt=media&token=b3bce5fb-0e97-49e3-bfdf-65244b0fc74d',
+        'https://firebasestorage.googleapis.com/v0/b/home-screen-b422f.appspot.com/o/images%2Fback3.jpg_1593752464204?alt=media&token=9cf1e477-5c13-4817-a53c-9ad98f84bc07',
       name: user.displayName,
       questionLabel: 'What is your main focus for today?',
       quoteLabel: 'Feelings are just visitors. Let them come and go',
@@ -61,6 +72,7 @@ export class AuthService {
         greetings: true,
         question: true,
       },
+      imageName: 'back3.jpg_1593752464204',
       email: user.email,
       profilePhotoURL: user.photoURL,
     };

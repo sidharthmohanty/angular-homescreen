@@ -20,6 +20,7 @@ export class ModalComponent implements OnInit {
   data;
   admin;
   role;
+  ui;
 
   constructor(
     public dataService: DataService,
@@ -32,6 +33,7 @@ export class ModalComponent implements OnInit {
       .pipe(
         tap((user) => {
           if (user) {
+            this.ui = true;
             this.dataService.getData(user.uid).subscribe((item) => {
               this.role = item.payload.doc.data()['role'];
               if (this.role === 'user') {
@@ -56,6 +58,7 @@ export class ModalComponent implements OnInit {
               }
             });
           } else {
+            this.ui = false;
             this.dataService.getAdmin().subscribe((el) => {
               this.data = el[0].payload.doc.data();
               this.toggleData = this.data.toggleData;

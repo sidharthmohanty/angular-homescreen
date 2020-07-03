@@ -154,6 +154,21 @@ input:checked + .slider:before {
   text-decoration: underline;
   color: white !important;
 }
+.promo-holder {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.8rem;
+  margin-bottom: -0.8rem;
+}
+.promo {
+  font-size: 0.7rem;
+  margin-right: 0.3rem;
+  font-weight: bold;
+}
+.promo-logo {
+  height: 1rem;
+  margin-bottom: 6px;
+}
 @media (max-width: 600px) {
   .cdk-overlay-pane {
     left: 0px !important;

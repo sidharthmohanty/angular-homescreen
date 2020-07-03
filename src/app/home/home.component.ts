@@ -12,6 +12,7 @@ import { finalize, first, tap } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AuthService } from '../auth.service';
 import { Observable } from 'rxjs';
+import * as firebase from 'firebase';
 
 @Component({
   selector: 'app-home',
@@ -68,13 +69,13 @@ export class HomeComponent implements OnInit {
   imageList;
   backgroundImage;
   url;
-  ui = true;
   elem = this.document.documentElement;
   subBtn = true;
   canBtn = true;
   inpField = true;
   role;
-
+  store;
+  storeRef;
   formTemplate = new FormGroup({
     imageUrl: new FormControl('', Validators.required),
   });
@@ -87,6 +88,8 @@ export class HomeComponent implements OnInit {
     public dialog: MatDialog,
     private dataService: DataService
   ) {
+    this.store = firebase.storage();
+    this.storeRef = this.store.ref();
     setInterval(() => {
       this.now = Date.now();
     }, 1);
@@ -98,7 +101,6 @@ export class HomeComponent implements OnInit {
       .pipe(
         tap((user) => {
           if (user) {
-            this.ui = true;
             this.dataService.getData(user.uid).subscribe((item) => {
               this.role = item.payload.doc.data()['role'];
               this.name = item.payload.doc.data()['name'];
@@ -140,7 +142,6 @@ export class HomeComponent implements OnInit {
               }
             });
           } else {
-            this.ui = false;
             this.dataService.getAdmin().subscribe((el) => {
               this.data = el[0].payload.doc.data();
               this.toggleData = this.data.toggleData;
@@ -275,57 +276,68 @@ export class HomeComponent implements OnInit {
 
   onSubmit(formValue) {
     if (this.formTemplate.valid) {
-      this.auth.isLoggedIn().pipe(
-        tap((user) => {
-          if (user) {
-            this.ubar = !this.ubar;
-            const filePath = `images/${
-              this.selectedImage.name
-            }_${new Date().getTime()}`;
-            const fileRef = this.storage.ref(filePath);
-            this.task = this.storage.upload(filePath, this.selectedImage);
-            this.uploadProgress = this.task.percentageChanges();
-            this.inpField = !this.inpField;
-            this.subBtn = !this.subBtn;
-            this.canBtn = !this.canBtn;
-            if (this.role === 'user') {
-              this.task
-                .snapshotChanges()
-                .pipe(
-                  finalize(() => {
-                    fileRef.getDownloadURL().subscribe((url) => {
-                      formValue.imageUrl = url;
-                      this.data.imageUrl = url;
-                      this.dataService.updateData(this.data.id, this.data);
-                      this.resetForm();
-                      this.ubar = !this.ubar;
-                    });
-                  })
-                )
-                .subscribe();
+      this.auth
+        .isLoggedIn()
+        .pipe(
+          tap((user) => {
+            if (user) {
+              const imageName = `${
+                this.selectedImage.name
+              }_${new Date().getTime()}`;
+              this.data.imageName = imageName;
+              this.ubar = !this.ubar;
+              this.subBtn = !this.subBtn;
+              this.canBtn = !this.canBtn;
+              this.inpField = !this.inpField;
+
+              if (this.role === 'user') {
+                const filePath = `images/${imageName}`;
+                const fileRef = this.storage.ref(filePath);
+                this.task = this.storage.upload(filePath, this.selectedImage);
+                this.uploadProgress = this.task.percentageChanges();
+                this.task
+                  .snapshotChanges()
+                  .pipe(
+                    finalize(() => {
+                      fileRef.getDownloadURL().subscribe((url) => {
+                        formValue.imageUrl = url;
+                        this.data.imageUrl = url;
+                        this.dataService.updateData(this.data.id, this.data);
+                        this.resetForm();
+                        this.ubar = !this.ubar;
+                      });
+                    })
+                  )
+                  .subscribe();
+              } else {
+                const filePath = `adminImage/${imageName}`;
+                const fileRef = this.storage.ref(filePath);
+                this.task = this.storage.upload(filePath, this.selectedImage);
+                this.uploadProgress = this.task.percentageChanges();
+                this.task
+                  .snapshotChanges()
+                  .pipe(
+                    finalize(() => {
+                      fileRef.getDownloadURL().subscribe((url) => {
+                        formValue.imageUrl = url;
+                        this.data.imageUrl = url;
+                        console.log(this.data);
+                        this.dataService.updateAdmin(this.data.id, this.data);
+                        this.resetForm();
+                        this.ubar = !this.ubar;
+                      });
+                    })
+                  )
+                  .subscribe();
+              }
             } else {
-              this.task
-                .snapshotChanges()
-                .pipe(
-                  finalize(() => {
-                    fileRef.getDownloadURL().subscribe((url) => {
-                      formValue.imageUrl = url;
-                      this.data.imageUrl = url;
-                      this.dataService.updateAdmin(this.data.id, this.data);
-                      this.resetForm();
-                      this.ubar = !this.ubar;
-                    });
-                  })
-                )
-                .subscribe();
+              console.log('You are not logged in');
             }
-          } else {
-            console.log('You are not logged in');
-          }
-        })
-      );
+          })
+        )
+        .subscribe();
     } else {
-      console.log('not valid');
+      console.log('form not valid');
     }
   }
   handleUpload(event) {

@@ -18,6 +18,7 @@
       data-toggle="modal"
       data-target="#exampleModalCenter"
       class="font-italic text-muted change-image"
+      *ngIf="ui"
     >
       Change background
     </a>
@@ -135,3 +136,14 @@
   </div>
 </ng-template>
 <div class="cone"></div>
+<div class="promo-holder">
+  <span class="promo text-muted">
+    Powered by:
+  </span>
+  <span
+    ><img
+      src="../../assets/logo/nettantra-logo.png"
+      alt="logo"
+      class="promo-logo"
+  /></span>
+</div>

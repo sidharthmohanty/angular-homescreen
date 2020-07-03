@@ -15,4 +15,5 @@ export interface User {
   email: string;
   profilePhotoURL?: string;
   role: string;
+  imageName: string;
 }

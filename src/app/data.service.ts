@@ -16,7 +16,7 @@ export class DataService {
     greetings: true,
     question: true,
     quote: true,
-    dataAndTime: true,
+    dateAndTime: true,
     tempAndLocation: true,
   };
 
@@ -44,9 +44,6 @@ export class DataService {
     this.db.doc(`admin/${id}`).update(data);
   }
 
-  insertImage(image) {
-    this.itemsRef.add(image);
-  }
   getData(id) {
     return this.db
       .collection('users', (ref) => ref.where('id', '==', id).limit(1))
