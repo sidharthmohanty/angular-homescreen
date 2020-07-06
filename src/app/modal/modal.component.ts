@@ -59,15 +59,12 @@ export class ModalComponent implements OnInit {
             });
           } else {
             this.ui = false;
-            this.dataService.getAdmin().subscribe((el) => {
-              this.data = el[0].payload.doc.data();
-              this.toggleData = this.data.toggleData;
-              this.greetings = this.toggleData.greetings;
-              this.dateAndTime = this.toggleData.dateAndTime;
-              this.question = this.toggleData.question;
-              this.tempAndLocation = this.toggleData.tempAndLocation;
-              this.quote = this.toggleData.quote;
-            });
+            this.toggleData = this.dataService.toggleDataSource;
+            this.greetings = this.toggleData.greetings;
+            this.dateAndTime = this.toggleData.dateAndTime;
+            this.question = this.toggleData.question;
+            this.tempAndLocation = this.toggleData.tempAndLocation;
+            this.quote = this.toggleData.quote;
           }
         })
       )

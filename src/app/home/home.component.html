@@ -1,25 +1,27 @@
 <!--date time, temp, location-->
 <header>
-  <div class="sub-head-1 header-text" *ngIf="dateAndTime">
-    <div>Time: {{ now | date: "h:mm aa" }}</div>
-    <div>Date: {{ now | date }}</div>
-  </div>
-  <div class="sub-head-2" *ngIf="tempAndLocation">
-    <div class="header-temp">
-      <span class="mr-2">
-        <mat-icon aria-hidden="false" aria-label="Example home icon">
-          cloud
-        </mat-icon>
-      </span>
-      <!-- <span *ngIf="!clouds" class="mr-2">
+  <div class="header-content">
+    <div class="sub-head-1 header-text" *ngIf="dateAndTime">
+      <div>Time: {{ now | date: "h:mm aa" }}</div>
+      <div>Date: {{ now | date }}</div>
+    </div>
+    <div class="sub-head-2" *ngIf="tempAndLocation">
+      <div class="header-temp">
+        <span class="cloud mr-2">
+          <mat-icon aria-hidden="false" aria-label="Example home icon">
+            cloud
+          </mat-icon>
+        </span>
+        <!-- <span *ngIf="!clouds" class="mr-2">
         <mat-icon aria-hidden="false" aria-label="Example home icon">
           wb_sunny
         </mat-icon>
       </span> -->
-      <span>{{ temp }}</span
-      ><sup>o</sup>
+        <span class="temp">{{ temp }}</span
+        ><sup>o</sup>
+      </div>
+      <div class="header-location">{{ city }}</div>
     </div>
-    <div class="header-location">{{ city }}</div>
   </div>
 </header>
 
@@ -38,17 +40,19 @@
     >
       {{ questionLabel }}
     </div>
-    <span
-      class="saveQuestion badge badge-pill badge-light"
-      *ngIf="queSaveBtn"
-      (click)="updateQuestion()"
-      >save</span
-    ><span
-      *ngIf="queSaveBtn"
-      class="saveQuestion badge badge-pill badge-danger ml-1"
-      (click)="cancelEdit()"
-      >cancel</span
-    >
+    <div class="badge-container">
+      <span
+        class="saveQuestion badge badge-pill badge-light"
+        *ngIf="queSaveBtn"
+        (click)="updateQuestion()"
+        >save</span
+      ><span
+        *ngIf="queSaveBtn"
+        class="saveQuestion badge badge-pill badge-danger ml-1"
+        (click)="cancelEdit()"
+        >cancel</span
+      >
+    </div>
 
     <div *ngIf="!question" class="answer">
       {{ answerLabel }}
@@ -66,57 +70,6 @@
     />
   </div>
 </div>
-
-<!--settings, fullscreen-->
-
-<footer>
-  <div class="footer-content">
-    <div class="header-text">
-      <span (click)="openModal()">
-        <i class="material-icons show">settings</i>
-      </span>
-    </div>
-    <div>
-      <span
-        class="quote"
-        *ngIf="quote"
-        contenteditable="true"
-        #quo
-        (click)="toggleSaveQuo()"
-        >"{{ quoteLabel }}"</span
-      >
-      <span
-        *ngIf="quoSaveBtn"
-        class="saveQuote badge badge-pill badge-light"
-        (click)="updateQuote()"
-        >save</span
-      >
-      <span
-        *ngIf="quoSaveBtn"
-        class="saveQuote badge badge-pill badge-danger ml-1"
-        (click)="cancelEdit()"
-        >cancel</span
-      >
-    </div>
-    <div class="header-text">
-      <span
-        *ngIf="fscreen"
-        class="material-icons show"
-        (click)="openFullscreen()"
-      >
-        fullscreen
-      </span>
-      <span
-        *ngIf="!fscreen"
-        class="material-icons show"
-        (click)="closeFullscreen()"
-      >
-        close_fullscreen
-      </span>
-    </div>
-  </div>
-</footer>
-
 <!--Modal-->
 
 <div
@@ -191,3 +144,53 @@
     </div>
   </div>
 </div>
+
+<!--settings, fullscreen-->
+
+<footer>
+  <div class="footer-content">
+    <div class="header-text">
+      <span (click)="openModal()">
+        <i class="material-icons show">settings</i>
+      </span>
+    </div>
+    <div>
+      <span
+        class="quote"
+        *ngIf="quote"
+        contenteditable="true"
+        #quo
+        (click)="toggleSaveQuo()"
+        >"{{ quoteLabel }}"</span
+      >
+      <span
+        *ngIf="quoSaveBtn"
+        class="saveQuote badge badge-pill badge-light"
+        (click)="updateQuote()"
+        >save</span
+      >
+      <span
+        *ngIf="quoSaveBtn"
+        class="saveQuote badge badge-pill badge-danger ml-1"
+        (click)="cancelEdit()"
+        >cancel</span
+      >
+    </div>
+    <div class="header-text">
+      <span
+        *ngIf="fscreen"
+        class="material-icons show"
+        (click)="openFullscreen()"
+      >
+        fullscreen
+      </span>
+      <span
+        *ngIf="!fscreen"
+        class="material-icons show"
+        (click)="closeFullscreen()"
+      >
+        close_fullscreen
+      </span>
+    </div>
+  </div>
+</footer>

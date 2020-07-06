@@ -1,5 +1,11 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, OnInit, Inject, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Inject,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { ModalComponent } from '../modal/modal.component';
 import { DataService } from '../data.service';
@@ -18,6 +24,7 @@ import * as firebase from 'firebase';
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class HomeComponent implements OnInit {
   @ViewChild('que') que;
@@ -103,11 +110,14 @@ export class HomeComponent implements OnInit {
           if (user) {
             this.dataService.getData(user.uid).subscribe((item) => {
               this.role = item.payload.doc.data()['role'];
-              this.name = item.payload.doc.data()['name'];
+              this.name = item.payload.doc
+                .data()
+                ['name'].split(' ')
+                .slice(0, -1)
+                .join(' ');
               if (this.role === 'user') {
                 this.data = item.payload.doc.data();
                 this.toggleData = this.data.toggleData;
-                this.name = this.data.name;
                 this.answerLabel = this.data.answerLabel;
                 this.questionLabel = this.data.questionLabel;
                 this.quoteLabel = this.data.quoteLabel;
@@ -119,6 +129,7 @@ export class HomeComponent implements OnInit {
                 this.url = this.data.imageUrl.replace(/['"]+/g, '');
                 this.document.body.style.backgroundImage = `url(${this.url})`;
                 if (this.answerLabel) {
+                  this.dtag = true;
                   this.question = false;
                 }
               } else {
@@ -136,6 +147,7 @@ export class HomeComponent implements OnInit {
                   this.url = this.data.imageUrl.replace(/['"]+/g, '');
                   this.document.body.style.backgroundImage = `url(${this.url})`;
                   if (this.answerLabel) {
+                    this.dtag = true;
                     this.question = false;
                   }
                 });
@@ -156,6 +168,7 @@ export class HomeComponent implements OnInit {
               this.url = this.data.imageUrl.replace(/['"]+/g, '');
               this.document.body.style.backgroundImage = `url(${this.url})`;
               if (this.answerLabel) {
+                this.dtag = true;
                 this.question = false;
               }
             });
